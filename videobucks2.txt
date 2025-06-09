@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>VideoBucks - Plataforma de Recompensas</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+  body {
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(135deg, #3a57e8 0%, #2f46d6 100%);
+    color: #fff;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .container {
+    background: #fff;
+    color: #222;
+    max-width: 480px;
+    width: 100%;
+    border-radius: 15px;
+    padding: 30px 25px 40px 25px;
+    box-shadow: 0 10px 25px rgba(58, 87, 232, 0.3);
+  }
+  h1 {
+    text-align: center;
+    color: #3a57e8;
+    margin-bottom: 30px;
+    font-weight: 700;
+    font-size: 2.5rem;
+  }
+  label {
+    font-weight: 600;
+    display: block;
+    margin-bottom: 6px;
+  }
+  input[type="text"], input[type="number"] {
+    width: 100%;
+    padding: 14px 15px;
+    font-size: 1rem;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    transition: border-color 0.3s ease;
+  }
+  input[type="text"]:focus, input[type="number"]:focus {
+    border-color: #3a57e8;
+    outline: none;
+  }
+  button {
+    width: 100%;
+    background: #3a57e8;
+    color: white;
+    padding: 14px 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  button:disabled {
+    background-color: #a6b5ff;
+    cursor: not-allowed;
+  }
+  button:hover:not(:disabled) {
+    background-color: #2f46d6;
+  }
+  .saldo-info {
+    background: #f7f9ff;
+    color: #222;
+    border-radius: 12px;
+    padding: 20px 25px;
+    margin-bottom: 30px;
+    box-shadow: 0 5px 15px rgba(58, 87, 232, 0.15);
+    display: flex;
+    justify-content: space-around;
+    font-weight: 600;
+    font-size: 1.1rem;
+  }
+  .saldo-item {
+    text-align: center;
+  }
+  .saldo-label {
+    font-size: 0.9rem;
+    color: #555;
+    margin-bottom: 6px;
+  }
+  #message {
+    text-align: center;
+    margin-bottom: 25px;
+    font-size: 1rem;
+    min-height: 24px;
+    color: #3a57e8;
+    font-weight: 600;
+  }
+  #videos {
+    margin-bottom: 30px;
+  }
+  .video-card {
+    background: #f7f9ff;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(58, 87, 232, 0.15);
+    margin-bottom: 25px;
+  }
+  iframe {
+    width: 100%;
+    height: 220px;
+    border: none;
+  }
+  .btn-watch {
+    background: #3a57e8;
+    color: white;
+    border: none;
+    font-weight: 700;
+    font-size: 1rem;
+    padding: 12px;
+    width: 100%;
+    cursor: pointer;
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+    transition: background-color 0.3s ease;
+  }
+  .btn-watch:disabled {
+    background-color: #a6b5ff;
+    cursor: not-allowed;
+  }
+  .btn-watch:hover:not(:disabled) {
+    background-color: #2f46d6;
+  }
+  @media (max-width: 480px) {
+    .container {
+      padding: 20px 20px 30px 20px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>VideoBucks</h1>
+
+  <div id="login-section">
+    <label for="username">Seu nome:</label>
+    <input type="text" id="username" placeholder="Digite seu nome" autocomplete="off" />
+    <button id="btn-login">Entrar</button>
+  </div>
+
+  <div id="app-section" style="display:none;">
+
+    <div class="saldo-info">
+      <div class="saldo-item">
+        <div class="saldo-label">Saldo bloqueado</div>
+        <div>R$ <span id="saldo-bloqueado">0.00</span></div>
+      </div>
+      <div class="saldo-item">
+        <div class="saldo-label">Saldo liberado (VideoBucks)</div>
+        <div>R$ <span id="saldo-liberado">0.00</span></div>
+      </div>
+    </div>
+
+    <label for="deposit-amount">Depositar valor (R$):</label>
+    <input type="number" id="deposit-amount" min="1" step="0.01" placeholder="Ex: 20.00" />
+    <button id="btn-depositar">Depositar (Simulado)</button>
+
+    <div id="message"></div>
+
+    <h2>Vídeos para assistir</h2>
+    <div id="videos"></div>
+
+    <button id="btn-sacar" disabled>Sacar VideoBucks (mínimo R$ 100)</button>
+
+  </div>
+</div>
+
+<script>
+  const videos = [
+    "https://www.youtube.com/embed/5qap5aO4i9A?autoplay=0&mute=1",
+    "https://www.youtube.com/embed/ScMzIvxBSi4?autoplay=0&mute=1",
+    "https://www.youtube.com/embed/lTRiuFIWV54?autoplay=0&mute=1",
+    "https://www.youtube.com/embed/hHW1oY26kxQ?autoplay=0&mute=1",
+    "https://www.youtube.com/embed/M7lc1UVf-VE?autoplay=0&mute=1"
+  ];
+
+  let saldoBloqueado = 0;
+  let saldoLiberado = 0;
+  let videosAssistidos = 0;
+  let nomeUsuario = "";
+
+  const valorPorVideo = 1.00;
+  const minimoSaque = 100.00;
+  const limiteVideosGratis = 5;
+
+  const loginSection = document.getElementById("login-section");
+  const appSection = document.getElementById("app-section");
+  const usernameInput = document.getElementById("username");
+  const btnLogin = document.getElementById("btn-login");
+  const saldoBloqueadoEl = document.getElementById("saldo-bloqueado");
+  const saldoLiberadoEl = document.getElementById("saldo-liberado");
+  const depositAmountInput = document.getElementById("deposit-amount");
+  const btnDepositar = document.getElementById("btn-depositar");
+  const videosDiv = document.getElementById("videos");
+  const btnSacar = document.getElementById("btn-sacar");
+  const messageEl = document.getElementById("message");
+
+  btnLogin.addEventListener("click", () => {
+    const name = usernameInput.value.trim();
+    if (name.length < 2) {
+      alert("Digite um nome válido.");
+      return;
+    }
+    nomeUsuario = name;
+    loginSection.style.display = "none";
+    appSection.style.display = "block";
+    messageEl.textContent = `Olá, ${nomeUsuario}! Comece depositando para assistir vídeos.`;
+    atualizarSaldo();
+    carregarVideos();
+  });
+
+  function atualizarSaldo() {
+    saldoBloqueadoEl.textContent = saldoBloqueado.toFixed(2);
+    saldoLiberadoEl.textContent = saldoLiberado.toFixed(2);
+    btnSacar.disabled = saldoLiberado < minimoSaque;
+  }
+
+  btnDepositar.addEventListener("click", () => {
+    const valor = parseFloat(depositAmountInput.value);
+    if (isNaN(valor) || valor < 1) {
+      alert("Digite um valor válido para depósito (mínimo R$ 1).");
+      return;
+    }
+    saldoBloqueado += valor;
+    depositAmountInput.value = "";
+    messageEl.textContent = `Depósito de R$ ${valor.toFixed(2)} realizado (simulado). Seu saldo bloqueado aumentou.`;
+    atualizarSaldo();
+    atualizarBotoesVideos();
+  });
+
+  function carregarVideos() {
+    videosDiv.innerHTML = "";
+    videos.forEach((url, idx) => {
+      const videoCard = document.createElement("div");
+      videoCard.className = "video-card";
+      videoCard.innerHTML = `
+        <iframe src="${url}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        <button class="btn-watch" id="btn-watch-${idx}">Assistir e ganhar R$ ${valorPorVideo.toFixed(2)}</button>
+      `;
+      videosDiv.appendChild(videoCard);
+      const btnWatch = videoCard.querySelector("button");
+      btnWatch.addEventListener("click", () => assistirVideo(idx));
+    });
+    atualizarBotoesVideos();
+  }
+
+  function atualizarBotoesVideos() {
+    const botoes = document.querySelectorAll(".btn-watch");
+    botoes.forEach((btn, idx) => {
+      if (videosAssistidos >= limiteVideosGratis) {
+        // Só pode assistir mais se saldo bloqueado > 0
+        btn.disabled = saldoBloqueado <= 0;
+      } else {
+        btn.disabled = false;
+      }
+    });
+  }
+
+  function assistirVideo(idx) {
+    if (videosAssistidos >= limiteVideosGratis) {
+      if (saldoBloqueado <= 0) {
+        alert("Você precisa depositar para liberar mais vídeos.");
+        return;
+      }
+      saldoBloqueado -= valorPorVideo;
+    }
+    videosAssistidos++;
+    saldoLiberado += valorPorVideo;
+    messageEl.textContent = `Você assistiu o vídeo e ganhou R$ ${valorPorVideo.toFixed(2)} em VideoBucks!`;
+    atualizarSaldo();
+    atualizarBotoesVideos();
+  }
+
+  btnSacar.addEventListener("click", () => {
+    if (saldoLiberado
